@@ -60,7 +60,7 @@ class EngineIO(LoggingMixin):
         if self._opened:
             return self._transport_instance
         self._engineIO_session = self._get_engineIO_session()
-        self._negotiate_transport()
+        # self._negotiate_transport()
         self._connect_namespaces()
         self._opened = True
         self._reset_heartbeat()
@@ -69,8 +69,10 @@ class EngineIO(LoggingMixin):
     def _get_engineIO_session(self):
         warning_screen = self._yield_warning_screen()
         for elapsed_time in warning_screen:
-            transport = XHR_PollingTransport(
+            transport = WebsocketTransport(
                 self._http_session, self._is_secure, self._url)
+            self._transport_instance = transport
+            self.transport_name = 'websocket'
             try:
                 engineIO_packet_type, engineIO_packet_data = next(
                     transport.recv_packet())
